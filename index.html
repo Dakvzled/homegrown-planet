@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homegrown Planet - Portal Game Edukasi Siklus Belajar Kolb</title>
+  <script src="coi-serviceworker.min.js"></script>
+  <link rel="icon" type="image/png" href="game.icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0c16;
+      --bg-card: #151628;
+      --bg-card-hover: #1c1e36;
+      --bg-glass: rgba(22, 24, 44, 0.75);
+      --accent-purple: #7c3aed;
+      --accent-indigo: #6366f1;
+      --accent-cyan: #06b6d4;
+      --accent-gold: #f59e0b;
+      --accent-green: #10b981;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border-color: rgba(99, 102, 241, 0.2);
+      --border-glow: rgba(124, 58, 237, 0.4);
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(124, 58, 237, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 60%);
+      background-attachment: fixed;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2a2d4a;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-purple);
+    }
+
+    /* Top Navigation Bar */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: var(--bg-glass);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+    }
+
+    .brand-logo img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .brand-name {
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      background: rgba(124, 58, 237, 0.3);
+      color: #c084fc;
+      border: 1px solid rgba(124, 58, 237, 0.5);
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15, 17, 30, 0.6);
+      padding: 4px 6px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 24px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-indigo));
+      box-shadow: 0 0 16px rgba(124, 58, 237, 0.4);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-quick-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: #fff;
+      text-decoration: none;
+      padding: 9px 18px;
+      border-radius: 24px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+      transition: all 0.25s ease;
+    }
+
+    .btn-quick-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    /* Hero Section */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 2.1fr 1fr;
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    @media (max-width: 960px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+      header {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+      }
+      nav {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
+
+    .hero-banner-card {
+      position: relative;
+      background: linear-gradient(180deg, rgba(21, 22, 40, 0.4) 0%, rgba(15, 17, 30, 0.95) 100%), url('assets/hero_banner.png');
+      background-size: cover;
+      background-position: center;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      min-height: 400px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 0 100px rgba(0, 0, 0, 0.7);
+    }
+
+    .hero-banner-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(11, 12, 22, 0.95) 0%, rgba(11, 12, 22, 0.5) 60%, transparent 100%);
+      z-index: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 650px;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(99, 102, 241, 0.25);
+      border: 1px solid rgba(99, 102, 241, 0.5);
+      color: #a5b4fc;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .hero-title {
+      font-size: 2.75rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+    }
+
+    .hero-desc {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn-play-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 14px 28px;
+      border-radius: 30px;
+      text-decoration: none;
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.45);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-play-primary:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 0 35px rgba(16, 185, 129, 0.7);
+    }
+
+    .play-icon-circle {
+      width: 28px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(30, 33, 58, 0.8);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.92rem;
+      padding: 13px 22px;
+      border-radius: 30px;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(45, 50, 85, 0.9);
+      border-color: var(--accent-indigo);
+      transform: translateY(-2px);
+    }
+
+    /* Side Widget Card */
+    .hero-side-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .side-card-header {
+      margin-bottom: 20px;
+    }
+
+    .side-card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .side-card-subtitle {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: rgba(11, 12, 22, 0.6);
+      border-radius: var(--radius-sm);
+      margin-bottom: 10px;
+      font-size: 0.88rem;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .status-label {
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-value {
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .authors-mini {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .authors-mini strong {
+      color: #e2e8f0;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* Section Components */
+    .section-wrap {
+      margin-bottom: 64px;
+      scroll-margin-top: 90px;
+    }
+
+    .section-header {
+      margin-bottom: 28px;
+    }
+
+    .section-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .section-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 700px;
+      margin-top: 6px;
+    }
+
+    /* GAME PLAYER EMBED ZONE */
+    .game-player-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6), 0 0 30px rgba(99, 102, 241, 0.15);
+    }
+
+    .game-toolbar {
+      background: #111322;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .game-toolbar-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .indicator-live {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #10b981;
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
+    }
+
+    .game-controls-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tool-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .tool-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .game-frame-container {
+      position: relative;
+      width: 100%;
+      height: 600px;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 768px) {
+      .game-frame-container {
+        height: 380px;
+      }
+    }
+
+    .game-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    .game-overlay-launcher {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(11, 12, 22, 0.7) 0%, rgba(11, 12, 22, 0.95) 100%), url('assets/hero_banner.png');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .launcher-btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.25rem;
+      padding: 18px 42px;
+      border-radius: 40px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 35px rgba(16, 185, 129, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .launcher-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 50px rgba(16, 185, 129, 0.9);
+    }
+
+    .game-hints-bar {
+      background: #111322;
+      padding: 12px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-around;
+      gap: 16px;
+      font-size: 0.82rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .key-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      color: #38bdf8;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+      margin-right: 4px;
+    }
+
+    /* TUTORIAL CARDS */
+    .tutorial-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .tutorial-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tutorial-card:hover {
+      transform: translateY(-4px);
+      background: var(--bg-card-hover);
+      border-color: var(--accent-indigo);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .tutorial-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(124, 58, 237, 0.25);
+      color: #c084fc;
+      border: 1px solid rgba(124, 58, 237, 0.5);
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .tutorial-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .tutorial-body {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      flex-grow: 1;
+    }
+
+    .tutorial-meta {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.8rem;
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    /* REVIEW & EVALUASI SECTION */
+    .review-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 28px;
+    }
+
+    @media (max-width: 900px) {
+      .review-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .review-form-card, .review-info-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #cbd5e1;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      background: rgba(11, 12, 22, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-sm);
+      color: #fff;
+      padding: 12px 16px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 12px rgba(124, 58, 237, 0.3);
+    }
+
+    .star-rating {
+      display: flex;
+      gap: 8px;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .star {
+      color: #475569;
+      transition: color 0.2s;
+    }
+
+    .star.selected, .star:hover {
+      color: #fbbf24;
+    }
+
+    .btn-submit-review {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-indigo));
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4);
+      transition: all 0.25s ease;
+    }
+
+    .btn-submit-review:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(124, 58, 237, 0.6);
+    }
+
+    .kolb-style-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(15, 17, 30, 0.6);
+      border-radius: var(--radius-sm);
+      margin-bottom: 12px;
+      border-left: 4px solid var(--accent-indigo);
+    }
+
+    .kolb-style-badge.diverger { border-left-color: #10b981; }
+    .kolb-style-badge.assimilator { border-left-color: #38bdf8; }
+    .kolb-style-badge.converger { border-left-color: #fbbf24; }
+    .kolb-style-badge.accommodator { border-left-color: #f43f5e; }
+
+    /* IDENTITAS CARD */
+    .identity-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .author-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .author-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-purple);
+      box-shadow: 0 16px 32px rgba(124, 58, 237, 0.2);
+    }
+
+    .author-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      color: #fff;
+      font-weight: 800;
+      box-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+      flex-shrink: 0;
+    }
+
+    .author-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .author-nim {
+      color: #38bdf8;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .author-desc {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border-color);
+      background: rgba(11, 12, 22, 0.95);
+      padding: 32px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <a href="#" class="brand">
+      <div class="brand-logo">
+        <img src="assets/logo.png" alt="Logo">
+      </div>
+      <div class="brand-name">
+        HOMEGROWN PLANET
+        <span class="brand-badge">BETA v0.6</span>
+      </div>
+    </a>
+
+    <nav>
+      <a class="nav-link active" onclick="scrollToSection('hero')">Beranda</a>
+      <a class="nav-link" onclick="scrollToSection('play-zone')">Main Langsung</a>
+      <a class="nav-link" onclick="scrollToSection('tutorial')">Panduan Tutorial</a>
+      <a class="nav-link" onclick="scrollToSection('deskripsi')">Deskripsi Game</a>
+      <a class="nav-link" onclick="scrollToSection('review')">Review & Kolb</a>
+      <a class="nav-link" onclick="scrollToSection('identitas')">Identitas</a>
+    </nav>
+
+    <div class="nav-actions">
+      <a href="https://github.com/Dakvzled/homegrown-planet/releases/download/v1.0.0/Homegrown-Planet.exe" download="Homegrown-Planet.exe" class="btn-quick-download">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+          <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+        </svg>
+        Download (.EXE)
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero-grid">
+      <!-- Main Featured Banner -->
+      <div class="hero-banner-card">
+        <div class="hero-content">
+          <span class="hero-tag">GAME EDUKASI PETUALANGAN ANTARIKSA</span>
+          <h1 class="hero-title">Homegrown Planet</h1>
+          <p class="hero-desc">
+            Eksplorasi planet asing, kumpulkan sumber daya, rancang perkakas bertahan hidup, dan pecahkan kuis refleksi lintas galaksi yang diintegrasikan secara presisi dengan 4 pilar Siklus Belajar Experiential David Kolb.
+          </p>
+          <div class="hero-actions">
+            <button class="btn-play-primary" onclick="launchGame()">
+              <div class="play-icon-circle">▶</div>
+              MAIN LANGSUNG DI WEB
+            </button>
+            <a href="https://github.com/Dakvzled/homegrown-planet/releases/download/v1.0.0/Homegrown-Planet.exe" download="Homegrown-Planet.exe" class="btn-secondary">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+              </svg>
+              Unduh Versi Desktop (.exe)
+            </a>
+            <a href="Storyboard_Evaluasi_Homegrown_Planet.pdf" target="_blank" class="btn-secondary">
+              📄 Buka Storyboard PDF
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Info Side Widget -->
+      <div class="hero-side-card">
+        <div class="side-card-header">
+          <h3 class="side-card-title">
+            <span style="color:#a855f7;">✦</span> Status Sistem Game
+          </h3>
+          <p class="side-card-subtitle">Edisi Kolb Learning Cycle</p>
+        </div>
+
+        <div class="side-card-body">
+          <div class="status-item">
+            <span class="status-label">Engine</span>
+            <span class="status-value">Godot 4.3</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">Platform Web</span>
+            <span class="status-value">WebAssembly / HTML5</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">Versi Desktop</span>
+            <span class="status-value">Windows x64 (.exe)</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">Model Belajar</span>
+            <span class="status-value" style="color:#10b981;">Kolb 4 Pilar</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">Bahasa Narasi</span>
+            <span class="status-value">Bahasa Indonesia</span>
+          </div>
+        </div>
+
+        <div class="authors-mini">
+          <strong>Tim Pengembang:</strong>
+          Ahmad Dhani Kusuma (K3524003)<br>
+          Rakha Admaja Sukendra (K3524065)<br>
+          PTIK - FKIP Universitas Sebelas Maret
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Game Player Zone -->
+    <section id="play-zone" class="section-wrap">
+      <div class="section-header">
+        <span class="section-badge">BAGAN GAME BERMAIN LANGSUNG</span>
+        <h2 class="section-title">Play Homegrown Planet Online</h2>
+        <p class="section-desc">Mainkan langsung game di peramban Anda tanpa perlu instalasi tambahan, atau mainkan versi desktop berkinerja tinggi melalui opsi unduh.</p>
+      </div>
+
+      <div class="game-player-card">
+        <div class="game-toolbar">
+          <div class="game-toolbar-title">
+            <span class="indicator-live"></span>
+            Homegrown Planet - Web Player
+          </div>
+          <div class="game-controls-actions">
+            <button class="tool-btn" onclick="reloadGame()">🔄 Muat Ulang</button>
+            <button class="tool-btn" onclick="toggleFullscreen()">⛶ Layar Penuh</button>
+          </div>
+        </div>
+
+        <div class="game-frame-container" id="game-container">
+          <div class="game-overlay-launcher" id="game-launcher-overlay">
+            <button class="launcher-btn" onclick="activateGame()">
+              <span style="font-size: 1.5rem;">▶</span> KLIK UNTUK MEMULAI GAME
+            </button>
+            <p style="color: #cbd5e1; font-size: 0.95rem; max-width: 450px;">
+              Klik tombol di atas untuk memuat WebAssembly engine. Pastikan peramban Anda mendukung WebGL2 & WebAssembly.
+            </p>
+          </div>
+          <iframe id="game-frame" class="game-iframe" src="about:blank" allow="autoplay; fullscreen; focus-without-user-activation"></iframe>
+        </div>
+
+        <div class="game-hints-bar">
+          <div><span class="key-badge">W</span><span class="key-badge">A</span><span class="key-badge">S</span><span class="key-badge">D</span> Bergerak & Melompat</div>
+          <div><span class="key-badge">E</span> Buka Inventaris & Crafting</div>
+          <div><span class="key-badge">J</span> Aksi 1 (Gali / Serang)</div>
+          <div><span class="key-badge">K</span> Aksi 2</div>
+          <div><span class="key-badge">Tombol Kapal</span> Berkedip di pojok kanan atas untuk jelajah planet</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page Tutorial & Panduan Kolb -->
+    <section id="tutorial" class="section-wrap">
+      <div class="section-header">
+        <span class="section-badge">PANDUAN LENGKAP</span>
+        <h2 class="section-title">Tutorial Misi & 4 Siklus Belajar Kolb</h2>
+        <p class="section-desc">Pahami alur misi pembelajaran dari tahap fisik, perakitan alat, navigasi tata surya hingga refleksi pemecahan masalah.</p>
+      </div>
+
+      <div class="tutorial-grid">
+        <div class="tutorial-card">
+          <div class="tutorial-number">01</div>
+          <h3 class="tutorial-title">1. Mengalami (CE)</h3>
+          <p class="tutorial-body">
+            Rasakan langsung interaksi kinestetik dan fisik di planet asal: tebang pohon <strong>(0/1)</strong>, gali tanah <strong>(3x)</strong>, dan tambang batu <strong>(4x)</strong>. Misi ini menumbuhkan adaptasi mekanik awal pemain.
+          </p>
+          <div class="tutorial-meta">Concrete Experience</div>
+        </div>
+
+        <div class="tutorial-card">
+          <div class="tutorial-number">02</div>
+          <h3 class="tutorial-title">2. Merefleksikan (RO)</h3>
+          <p class="tutorial-body">
+            Tekan <strong>[E]</strong> untuk membuka inventaris. Amati bahan yang telah terkumpul dan refleksikan kegunaannya untuk membuat <strong>Workbench</strong> serta <strong>Oven</strong> untuk kebutuhan bertahan hidup.
+          </p>
+          <div class="tutorial-meta">Reflective Observation</div>
+        </div>
+
+        <div class="tutorial-card">
+          <div class="tutorial-number">03</div>
+          <h3 class="tutorial-title">3. Memikirkan (AC)</h3>
+          <p class="tutorial-body">
+            Klik tombol kapal luar angkasa yang <strong>berkedip di pojok kanan atas</strong>. Ikuti navigasi pinpoint bintang menuju 3 planet tujuan, lalu selesaikan kuis refleksi pemecahan masalah di setiap planet.
+          </p>
+          <div class="tutorial-meta">Abstract Conceptualization</div>
+        </div>
+
+        <div class="tutorial-card">
+          <div class="tutorial-number">04</div>
+          <h3 class="tutorial-title">4. Mencoba (AE)</h3>
+          <p class="tutorial-body">
+            Terapkan strategi bertahan hidup dan keputusan analitis di planet baru. Di akhir perjalanan, game akan mengakumulasi skor dan menampilkan <strong>Profil Gaya Belajar Kolb</strong> Anda secara menyeluruh.
+          </p>
+          <div class="tutorial-meta">Active Experimentation</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page Deskripsi Game -->
+    <section id="deskripsi" class="section-wrap">
+      <div class="section-header">
+        <span class="section-badge">DESKRIPSI LENGKAP</span>
+        <h2 class="section-title">Tentang Homegrown Planet</h2>
+        <p class="section-desc">Kombinasi petualangan survival sandbox pixel art dengan integrasi pembelajaran bermakna.</p>
+      </div>
+
+      <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 36px; box-shadow: 0 16px 32px rgba(0,0,0,0.3);">
+        <p style="margin-bottom: 20px; font-size: 1.05rem; color: #e2e8f0;">
+          <strong>Homegrown Planet</strong> adalah game 2D sandbox exploration berbasis piksel yang mengajak pemain berperan sebagai astronot yang menjelajahi tata surya. Pemain dapat menambang sumber daya, memodifikasi lingkungan mikro, merakit teknologi, serta mengarungi berbagai bintang eksotis dengan kondisi cuaca dan gravitasi yang unik.
+        </p>
+        <p style="margin-bottom: 24px; color: var(--text-muted); font-size: 0.95rem;">
+          Keunggulan utama game ini adalah implementasi <em>Experiential Learning Theory (David A. Kolb, 1984)</em>. Seluruh alur quest dirancang agar pemain tidak hanya bermain pasif, melainkan mengalami siklus belajar alami: merasakan sensasi fisik, merenungkan bahan yang diperoleh, mengonsepkan solusi terhadap tantangan lingkungan antariksa, hingga menguji hipotesis langsung di lapangan.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 24px;">
+          <div style="background: rgba(11,12,22,0.6); padding: 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="color: #38bdf8; font-weight: 700; margin-bottom: 6px;">🪐 Tata Surya Dinamis</div>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">Eksplorasi planet tipe Terra, Gurun, Salju, Raksasa Gas, hingga Asteroid.</div>
+          </div>
+          <div style="background: rgba(11,12,22,0.6); padding: 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="color: #10b981; font-weight: 700; margin-bottom: 6px;">🛠️ Crafting & Survival</div>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">Rakit Workbench, Oven, modul oksigen, dan perkakas penjelajahan.</div>
+          </div>
+          <div style="background: rgba(11,12,22,0.6); padding: 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="color: #f59e0b; font-weight: 700; margin-bottom: 6px;">💡 Kuis Refleksi Kolb</div>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">Uji kemampuan pengambilan keputusan analitis di setiap planet tujuan.</div>
+          </div>
+          <div style="background: rgba(11,12,22,0.6); padding: 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="color: #c084fc; font-weight: 700; margin-bottom: 6px;">📊 Profil Gaya Belajar</div>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">Dapatkan diagnosa apakah Anda Diverger, Assimilator, Converger, atau Accommodator.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page Review & Angket Penilaian -->
+    <section id="review" class="section-wrap">
+      <div class="section-header">
+        <span class="section-badge">EVALUASI & ANGKET</span>
+        <h2 class="section-title">Review & Penilaian Siklus Belajar Kolb</h2>
+        <p class="section-desc">Beri evaluasi dan ulasan terhadap efektivitas game Homegrown Planet sebagai media pembelajaran eksperiensial.</p>
+      </div>
+
+      <div class="review-grid">
+        <!-- Angket Form Card -->
+        <div class="review-form-card">
+          <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 16px;">Formulir Angket Evaluasi Game</h3>
+          <form id="reviewForm" onsubmit="handleReviewSubmit(event)">
+            <div class="form-group">
+              <label class="form-label">Nama Penilai / Reviewer</label>
+              <input type="text" id="reviewerName" class="form-input" placeholder="Masukkan nama atau institusi Anda" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Rating Kualitas Game & Edukasi</label>
+              <div class="star-rating" id="starContainer">
+                <span class="star" onclick="setRating(1)">★</span>
+                <span class="star" onclick="setRating(2)">★</span>
+                <span class="star" onclick="setRating(3)">★</span>
+                <span class="star" onclick="setRating(4)">★</span>
+                <span class="star" onclick="setRating(5)">★</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Kesesuaian Indikator Kolb yang Paling Berkesan</label>
+              <select id="kolbAspect" class="form-select">
+                <option value="Concrete Experience">Concrete Experience (Eksplorasi fisik sumber daya)</option>
+                <option value="Reflective Observation">Reflective Observation (Perenungan saat crafting workbench)</option>
+                <option value="Abstract Conceptualization">Abstract Conceptualization (Kuis pemecahan masalah planet)</option>
+                <option value="Active Experimentation">Active Experimentation (Penerapan strategi di planet baru)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Ulasan, Kesan, atau Masukan</label>
+              <textarea id="reviewComment" class="form-textarea" rows="4" placeholder="Tuliskan pengalaman Anda saat memainkan game Homegrown Planet..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit-review">Kirim Penilaian & Ulasan</button>
+          </form>
+
+          <div id="reviewSuccessMsg" style="display:none; margin-top: 16px; padding: 12px; border-radius: 8px; background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #6ee7b7; text-align: center; font-weight: 600;">
+            ✓ Terima kasih! Ulasan dan evaluasi Anda telah tersimpan.
+          </div>
+        </div>
+
+        <!-- Kolb Reference Info Card -->
+        <div class="review-info-card">
+          <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 16px; color: #fff;">4 Profil Gaya Belajar Kolb</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;">
+            Siklus belajar David Kolb menghasilkan 4 kuadran gaya belajar yang tercermin dari tindakan dan jawaban kuis pemain:
+          </p>
+
+          <div class="kolb-style-badge diverger">
+            <div>
+              <strong style="color: #10b981;">Diverger (CE + RO)</strong>
+              <div style="font-size: 0.82rem; color: #cbd5e1;">Imajinatif, peka emosional, melihat situasi dari beragam sudut pandang, menyukai pengamatan mendalam.</div>
+            </div>
+          </div>
+
+          <div class="kolb-style-badge assimilator">
+            <div>
+              <strong style="color: #38bdf8;">Assimilator (RO + AC)</strong>
+              <div style="font-size: 0.82rem; color: #cbd5e1;">Logis, konseptual, sistematis, menyukai penjelasan teoritis dan model analitis yang runtut.</div>
+            </div>
+          </div>
+
+          <div class="kolb-style-badge converger">
+            <div>
+              <strong style="color: #fbbf24;">Converger (AC + AE)</strong>
+              <div style="font-size: 0.82rem; color: #cbd5e1;">Praktis, pemecah masalah tangkas, menyukai penerapan gagasan teknis ke dalam implementasi nyata.</div>
+            </div>
+          </div>
+
+          <div class="kolb-style-badge accommodator">
+            <div>
+              <strong style="color: #f43f5e;">Accommodator (AE + CE)</strong>
+              <div style="font-size: 0.82rem; color: #cbd5e1;">Dinamis, pengambil risiko, mengandalkan intuisi spontan, berani melakukan trial-and-error langsung.</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 24px; padding: 16px; background: rgba(124,58,237,0.1); border: 1px dashed rgba(124,58,237,0.4); border-radius: 12px; font-size: 0.85rem; color: #c4b5fd;">
+            💡 <strong>Rekomendasi Penilaian:</strong> Isi kuesioner setelah menuntaskan seluruh 4 tahap di dalam game untuk mendapatkan pengalaman evaluasi yang utuh.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page Identitas Pengembang -->
+    <section id="identitas" class="section-wrap">
+      <div class="section-header">
+        <span class="section-badge">PROFIL PENGEMBANG</span>
+        <h2 class="section-title">Identitas Tim Pengembang</h2>
+        <p class="section-desc">Proyek media pembelajaran interaktif berbasis game dikembangkan oleh:</p>
+      </div>
+
+      <div class="identity-grid">
+        <div class="author-card">
+          <div class="author-avatar">AD</div>
+          <div>
+            <div class="author-name">Ahmad Dhani Kusuma</div>
+            <div class="author-nim">NIM: K3524003</div>
+            <div class="author-desc">
+              Pendidikan Teknik Informatika & Komputer (PTIK)<br>
+              Fakultas Keguruan dan Ilmu Pendidikan<br>
+              Universitas Sebelas Maret (UNS) Surakarta
+            </div>
+          </div>
+        </div>
+
+        <div class="author-card">
+          <div class="author-avatar">RA</div>
+          <div>
+            <div class="author-name">Rakha Admaja Sukendra</div>
+            <div class="author-nim">NIM: K3524065</div>
+            <div class="author-desc">
+              Pendidikan Teknik Informatika & Komputer (PTIK)<br>
+              Fakultas Keguruan dan Ilmu Pendidikan<br>
+              Universitas Sebelas Maret (UNS) Surakarta
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div style="max-width: 900px; margin: 0 auto;">
+      <p style="margin-bottom: 8px; color: #e2e8f0; font-weight: 600;">
+        Homegrown Planet &copy; 2026. Hak Cipta Dilindungi.
+      </p>
+      <p style="font-size: 0.82rem; color: #64748b;">
+        Dikembangkan untuk keperluan evaluasi media pembelajaran interaktif berbasis model Experiential Learning David Kolb.<br>
+        Program Studi Pendidikan Teknik Informatika & Komputer, Fakultas Keguruan dan Ilmu Pendidikan, Universitas Sebelas Maret.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Smooth navigation scrolling
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+      document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    // Launch game directly into iframe
+    function activateGame() {
+      const overlay = document.getElementById('game-launcher-overlay');
+      const frame = document.getElementById('game-frame');
+      overlay.style.display = 'none';
+      frame.src = 'game.html';
+    }
+
+    function launchGame() {
+      scrollToSection('play-zone');
+      activateGame();
+    }
+
+    function reloadGame() {
+      const frame = document.getElementById('game-frame');
+      if (frame.src && frame.src !== 'about:blank') {
+        frame.src = frame.src;
+      } else {
+        activateGame();
+      }
+    }
+
+    function toggleFullscreen() {
+      const container = document.getElementById('game-container');
+      if (!document.fullscreenElement) {
+        if (container.requestFullscreen) {
+          container.requestFullscreen();
+        } else if (container.webkitRequestFullscreen) {
+          container.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Star rating logic
+    let currentRating = 5;
+    function setRating(rating) {
+      currentRating = rating;
+      const stars = document.querySelectorAll('.star');
+      stars.forEach((star, idx) => {
+        if (idx < rating) {
+          star.classList.add('selected');
+        } else {
+          star.classList.remove('selected');
+        }
+      });
+    }
+    setRating(5);
+
+    // Handle review submission
+    function handleReviewSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('reviewerName').value;
+      const aspect = document.getElementById('kolbAspect').value;
+      const comment = document.getElementById('reviewComment').value;
+      
+      const reviewData = {
+        name: name,
+        rating: currentRating,
+        aspect: aspect,
+        comment: comment,
+        date: new Date().toISOString()
+      };
+
+      try {
+        let reviews = JSON.parse(localStorage.getItem('homegrown_reviews') || '[]');
+        reviews.unshift(reviewData);
+        localStorage.setItem('homegrown_reviews', JSON.stringify(reviews));
+      } catch (err) {
+        console.error(err);
+      }
+
+      document.getElementById('reviewSuccessMsg').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('reviewSuccessMsg').style.display = 'none';
+        document.getElementById('reviewForm').reset();
+        setRating(5);
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
